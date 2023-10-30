@@ -19,7 +19,7 @@ module control (opcode, aluOp, final_opcode, Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd
 
     // Define 5 signal
     or myRwe (Rwe, my_add, my_addi, my_lw);
-    assign Rdst = my_add;
+    assign Rdst = my_sw;
     or myALUinB (ALUinB, my_addi, my_lw, my_sw);
     assign ALUop = 1'b0; // not beq yet
     assign DMwe = my_sw;
