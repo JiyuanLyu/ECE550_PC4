@@ -1,1 +1,0 @@
-# ECE 550 Project Checkpoint 4
