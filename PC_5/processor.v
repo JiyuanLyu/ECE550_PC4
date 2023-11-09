@@ -100,7 +100,7 @@ module processor(
     assign address_imem = pc_current[11:0];
 
     // STEP: Decode
-    wire Rwe, Rdst, ALUinB, DMwe, Rwd;
+    wire Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd, BR, JP;
     // R-type
     wire [4:0] opcode, rd, rs, rt, shamt, aluOp, final_opcode;
     // I-type
@@ -151,7 +151,6 @@ module processor(
 	assign rstatus_of_signal = (~overflow) ? 1'b0 : (isAddi|myAdd|mySub) ? 1'b1 : 1'b0;
     assign rstatus_of = isAddi ? 32'd2 : myAdd ? 32'd1 : mySub ? 32'd3 : 32'b0;
 	assign ctrl_writeReg = rstatus_of_signal ? 5'b11110 : rd;
-
 
     // STEP: Memory
     assign address_dmem = alu_result[11:0];
