@@ -12,6 +12,16 @@ module control (opcode, aluOp, final_opcode, Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd
     assign my_sw = (~opcode[4])&(~opcode[3])&(opcode[2])&(opcode[1])&(opcode[0]);//00111
     assign my_lw = (~opcode[4])&(opcode[3])&(~opcode[2])&(~opcode[1])&(~opcode[0]);//01000
 
+    // Here we need to know if the operation is bne, j, jal, jr, blt, bex, setx
+    assign my_bne = (~opcode[4])&(~opcode[3])&(~opcode[2])&(opcode[1])&(~opcode[0]);//00010
+    assign my_j = (~opcode[4])&(~opcode[3])&(~opcode[2])&(~opcode[1])&(opcode[0]);//00001
+    assign my_jal = (~opcode[4])&(~opcode[3])&(~opcode[2])&(opcode[1])&(opcode[0]);//00011
+    assign my_jr = (~opcode[4])&(~opcode[3])&(opcode[2])&(~opcode[1])&(~opcode[0]);//00100
+    assign my_blt = (~opcode[4])&(~opcode[3])&(opcode[2])&(opcode[1])&(~opcode[0]);//00110
+    assign my_bex = (opcode[4])&(~opcode[3])&(opcode[2])&(opcode[1])&(~opcode[0]);//10110
+    assign my_setx =(opcode[4])&(~opcode[3])&(~opcode[2])&(opcode[1])&(~opcode[0]);
+    assign my
+
     // Find the final ALU opcode
     // If is R-type (opcode = 00000), then final code is aluOp
     // If is addi (opcode = 00101), then final code is 00000 (add)
