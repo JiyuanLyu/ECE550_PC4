@@ -97,7 +97,6 @@ module processor(
     wire pc_isNotEqual, pc_isLessThan, pc_overflow;
     pc_regsiter my_pc (clock, reset, 1'b1, pc_next, pc_current);
     alu pc_add1 (pc_current, 32'd1, 5'b00000, 5'b00000, pc_next, pc_isNotEqual, pc_isLessThan, pc_overflow);
-    alu pc_add2 (pc_current, 32'd1, 5'b00000, 5'b00000, pc_next, pc_isNotEqual, pc_isLessThan, pc_overflow);
     assign address_imem = pc_current[11:0];
 
     // STEP: Decode
