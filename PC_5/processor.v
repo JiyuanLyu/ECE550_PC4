@@ -174,7 +174,8 @@ module processor(
     alu my_pc_addN (pc_next, immeB, 5'b00000, 5'b00000, pc_addN, pc_isNotEqualN, pc_isLessThanN, pc_overflowN);
 	
     // j & jr & jal
-    assign pc_final = my_jal ? T : my_jr ? data_readRegA : JP ? T : br_sel ? pc_addN : pc_next;
+    assign pc_final = my_jr ? data_readRegA : JP ? T : br_sel ? pc_addN : pc_next;
+    //assign pc_final = my_jal ? T : my_jr ? data_readRegA : JP ? T : br_sel ? pc_addN : pc_next;
     pc_regsiter my_pc (clock, reset, 1'b1, pc_final, pc_current);
     assign address_imem = pc_current[11:0];
 
