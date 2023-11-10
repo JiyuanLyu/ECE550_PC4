@@ -119,6 +119,7 @@ module processor(
 
     // bex
     wire BEX, my_bex, my_bex_neq, my_final_bex;
+    wire [31:0] r30;
     assign my_bex = (opcode[4])&(~opcode[3])&(opcode[2])&(opcode[1])&(~opcode[0]);//10110
     assign r30 = data_readRegA;
     assign my_bex_neq = r30[31]|r30[30]|r30[29]|r30[28]|r30[27]|r30[26]|r30[25]|r30[24]|r30[23]|r30[22]|r30[21]|r30[20]|r30[19]|r30[18]|r30[17]|r30[16]|r30[15]|r30[14]|r30[13]|r30[12]|r30[11]|r30[10]|r30[9]|r30[8]|r30[7]|r30[6]|r30[5]|r30[4]|r30[3]|r30[2]|r30[1]|r30[0];
