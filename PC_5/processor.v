@@ -105,6 +105,8 @@ module processor(
     assign opcode = q_imem[31:27];
     assign aluOp = q_imem[6:2];
     control my_ctrl (opcode, aluOp, final_opcode, Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd, BR, JP);
+    assign my_jr = (~opcode[4])&(~opcode[3])&(opcode[2])&(~opcode[1])&(~opcode[0]);//00100
+    
 
     assign rd = q_imem[26:22];
     assign rs = q_imem[21:17];
@@ -123,16 +125,8 @@ module processor(
     and my_bex_and (my_final_bex, my_bex, my_bex_neq);
     assign final_JP = my_final_bex ? 1'b1 : JP;
 
-    // STEP: Fetch
-    wire [31:0] pc_next, pc_current;
-    wire pc_isNotEqual, pc_isLessThan, pc_overflow;
-    assign pc_next = final_JP ? T : 32'bz;
-    pc_regsiter my_pc (clock, reset, 1'b1, pc_next, pc_current);
-    alu pc_add1 (pc_current, 32'd1, 5'b00000, 5'b00000, pc_next, pc_isNotEqual, pc_isLessThan, pc_overflow);
-    assign address_imem = pc_current[11:0];
-
     // link s1 s2 and d for regfile
-    assign ctrl_readRegA = my_bex ? 5'b11110 : rs;
+    assign ctrl_readRegA = my_jr ? rd : my_bex ? 5'b11110 : rs;
     assign ctrl_readRegB = Rdst ? rd : rt;
     // assign ctrl_writeReg = rd;
 
@@ -143,6 +137,13 @@ module processor(
     sx my_sx (immeB, immediateN);
     assign aluB = ALUinB ? immeB : data_readRegB;
     alu my_alu (data_readRegA, aluB, final_opcode, shamt, alu_result, isNotEqual, isLessThan, overflow);
+    
+    // bne
+    wire br_sel, bne_sel, blt_sel;
+    and my_bne_and (bne_sel, BR, isNotEqual);
+    // blt
+    and my_blt_and (blt_sel, BR, isLessThan);
+    assign br_sel = bne_sel|blt_sel;
 
     // overflow
 	wire rstatus_of_signal;
@@ -152,17 +153,33 @@ module processor(
     assign isR = (~opcode[4])&(~opcode[3])&(~opcode[2])&(~opcode[1])&(~opcode[0]);//00000
     assign isAdd = (~aluOp[4])&(~aluOp[3])&(~aluOp[2])&(~aluOp[1])&(~aluOp[0]);//00000
     assign isSub = (~aluOp[4])&(~aluOp[3])&(~aluOp[2])&(~aluOp[1])&(aluOp[0]);//00001
+    assign my_setx =(opcode[4])&(~opcode[3])&(~opcode[2])&(opcode[1])&(~opcode[0]);//10101
+    assign my_jal = (~opcode[4])&(~opcode[3])&(~opcode[2])&(opcode[1])&(opcode[0]);//00011
     and myIsAdd (myAdd, isR, isAdd);
     and myIsSub (mySub, isR, isSub);
 	assign rstatus_of_signal = (~overflow) ? 1'b0 : (isAddi|myAdd|mySub) ? 1'b1 : 1'b0;
-    assign rstatus_of = isAddi ? 32'd2 : myAdd ? 32'd1 : mySub ? 32'd3 : 32'b0;
-	assign ctrl_writeReg = rstatus_of_signal ? 5'b11110 : rd;
+    assign rstatus_of = my_setx ? T : isAddi ? 32'd2 : myAdd ? 32'd1 : mySub ? 32'd3 : 32'b0;
+	assign ctrl_writeReg = my_jal ? 5'b11111 : my_setx ? 5'b11110 : rstatus_of_signal ? 5'b11110 : rd;
 
     // STEP: Memory
     assign address_dmem = alu_result[11:0];
     assign data = data_readRegB;
     assign wren = DMwe;
 
+    // STEP: Fetch
+    wire [31:0] pc_next, pc_current, pc_addN, pc_final;
+    wire pc_isNotEqual1, pc_isLessThan1, pc_overflow1, pc_isNotEqualN, pc_isLessThanN, pc_overflowN;
+    
+    alu pc_add1 (pc_current, 32'd1, 5'b00000, 5'b00000, pc_next, pc_isNotEqual1, pc_isLessThan1, pc_overflow1);
+    alu my_pc_addN (pc_next, immeB, 5'b00000, 5'b00000, pc_addN, pc_isNotEqualN, pc_isLessThanN, pc_overflowN);
+	
+    // j & jr & jal
+    assign pc_final = my_jal ? T : my_jr ? data_readRegA : final_JP ? T : br_sel ? pc_addN : pc_next;
+    assign address_imem = pc_current[11:0];
+
+    pc_regsiter my_pc (clock, reset, 1'b1, pc_final, pc_current);
+
     // STEP: Write
-    assign data_writeReg = rstatus_of_signal ? rstatus_of : Rwd ? q_dmem : alu_result;
+    assign data_writeReg = my_jal ? pc_next : rstatus_of_signal ? rstatus_of : Rwd ? q_dmem : alu_result;
+
 endmodule
