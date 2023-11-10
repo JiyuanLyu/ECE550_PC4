@@ -94,7 +94,7 @@ module processor(
 
 
     // STEP: Decode
-    wire Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd, BR, JP;
+    wire Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd, BR, JP, my_bne, my_blt;
     // R-type
     wire [4:0] opcode, rd, rs, rt, shamt, aluOp, final_opcode;
     // I-type
@@ -104,7 +104,7 @@ module processor(
 
     assign opcode = q_imem[31:27];
     assign aluOp = q_imem[6:2];
-    control my_ctrl (opcode, aluOp, final_opcode, Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd, BR, JP);
+    control my_ctrl (opcode, aluOp, final_opcode, Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd, BR, JP, my_bne, my_blt);
     assign my_jr = (~opcode[4])&(~opcode[3])&(opcode[2])&(~opcode[1])&(~opcode[0]);//00100
     
     assign rd = q_imem[26:22];
@@ -126,8 +126,8 @@ module processor(
     assign final_JP = my_final_bex ? 1'b1 : JP;
 
     // link s1 s2 and d for regfile
-    assign ctrl_readRegA = my_jr ? rd : my_bex ? 5'b11110 : rs;
-    assign ctrl_readRegB = Rdst ? rd : rt;
+    assign ctrl_readRegA = BR ? rd : my_jr ? rd : my_bex ? 5'b11110 : rs;
+    assign ctrl_readRegB = BR ? rs : Rdst ? rd : rt;
     // assign ctrl_writeReg = rd;
 
     // STEP: Execute
@@ -140,9 +140,9 @@ module processor(
     
     // bne
     wire br_sel, bne_sel, blt_sel;
-    and my_bne_and (bne_sel, BR, isNotEqual);
+    and my_bne_and (bne_sel, my_bne, isNotEqual);
     // blt
-    and my_blt_and (blt_sel, BR, isLessThan);
+    and my_blt_and (blt_sel, my_blt, isLessThan);
     assign br_sel = bne_sel|blt_sel;
 
     // overflow
