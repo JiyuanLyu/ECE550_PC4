@@ -92,12 +92,6 @@ module processor(
 
     /* YOUR CODE STARTS HERE */
 
-    // STEP: Fetch
-    wire [31:0] pc_next, pc_current;
-    wire pc_isNotEqual, pc_isLessThan, pc_overflow;
-    pc_regsiter my_pc (clock, reset, 1'b1, pc_next, pc_current);
-    alu pc_add1 (pc_current, 32'd1, 5'b00000, 5'b00000, pc_next, pc_isNotEqual, pc_isLessThan, pc_overflow);
-    assign address_imem = pc_current[11:0];
 
     // STEP: Decode
     wire Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd, BR, JP;
@@ -105,6 +99,8 @@ module processor(
     wire [4:0] opcode, rd, rs, rt, shamt, aluOp, final_opcode;
     // I-type
     wire [16:0] immediateN;
+    // JI-type
+    wire [26:0] target;
 
     assign opcode = q_imem[31:27];
     assign aluOp = q_imem[6:2];
@@ -124,6 +120,13 @@ module processor(
     assign my_bex_neq = r30[31]|r30[30]|r30[29]|r30[28]|r30[27]|r30[26]|r30[25]|r30[24]|r30[23]|r30[22]|r30[21]|r30[20]|r30[19]|r30[18]|r30[17]|r30[16]|r30[15]|r30[14]|r30[13]|r30[12]|r30[11]|r30[10]|r30[9]|r30[8]|r30[7]|r30[6]|r30[5]|r30[4]|r30[3]|r30[2]|r30[1]|r30[0]
     and my_bex_and (my_final_bex, my_bex, my_bex_neq);
     assign final_JP = my_final_bex ? 1'b1 : JP;
+
+    // STEP: Fetch
+    wire [31:0] pc_next, pc_current;
+    wire pc_isNotEqual, pc_isLessThan, pc_overflow;
+    pc_regsiter my_pc (clock, reset, 1'b1, pc_next, pc_current);
+    alu pc_add1 (pc_current, 32'd1, 5'b00000, 5'b00000, pc_next, pc_isNotEqual, pc_isLessThan, pc_overflow);
+    assign address_imem = pc_current[11:0];
 
     // link s1 s2 and d for regfile
     assign ctrl_readRegA = my_bex ? 5'b11110 : rs;
