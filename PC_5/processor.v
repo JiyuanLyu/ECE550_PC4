@@ -100,7 +100,7 @@ module processor(
     // I-type
     wire [16:0] immediateN;
     // JI-type
-    wire [26:0] target;
+    wire [31:0] T;
 
     assign opcode = q_imem[31:27];
     assign aluOp = q_imem[6:2];
@@ -112,6 +112,8 @@ module processor(
     assign shamt = q_imem[11:7];
     assign immediateN = q_imem[16:0];
     assign ctrl_writeEnable = Rwe;
+    assign T[26:0] = q_imem[26:0];
+    assign T[31:27] = 5'b00000;
 
     // bex
     wire BEX, my_bex, my_bex_neq, my_final_bex;
@@ -124,6 +126,7 @@ module processor(
     // STEP: Fetch
     wire [31:0] pc_next, pc_current;
     wire pc_isNotEqual, pc_isLessThan, pc_overflow;
+    assign pc_next = final_JP ? T : 32'bz;
     pc_regsiter my_pc (clock, reset, 1'b1, pc_next, pc_current);
     alu pc_add1 (pc_current, 32'd1, 5'b00000, 5'b00000, pc_next, pc_isNotEqual, pc_isLessThan, pc_overflow);
     assign address_imem = pc_current[11:0];
