@@ -104,7 +104,7 @@ module processor(
 
     assign opcode = q_imem[31:27];
     assign aluOp = q_imem[6:2];
-    control my_ctrl (opcode, aluOp, final_opcode, Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd, BR, JP, my_bne, my_blt);
+    control my_ctrl (opcode, aluOp, final_opcode, Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd, BR, JP, my_bne, my_blt, my_jal);
     assign my_jr = (~opcode[4])&(~opcode[3])&(opcode[2])&(~opcode[1])&(~opcode[0]);//00100
     
     assign rd = q_imem[26:22];
@@ -154,7 +154,7 @@ module processor(
     assign isAdd = (~aluOp[4])&(~aluOp[3])&(~aluOp[2])&(~aluOp[1])&(~aluOp[0]);//00000
     assign isSub = (~aluOp[4])&(~aluOp[3])&(~aluOp[2])&(~aluOp[1])&(aluOp[0]);//00001
     assign my_setx =(opcode[4])&(~opcode[3])&(opcode[2])&(~opcode[1])&(opcode[0]);//10101
-    assign my_jal = (~opcode[4])&(~opcode[3])&(~opcode[2])&(opcode[1])&(opcode[0]);//00011
+    //assign my_jal = (~opcode[4])&(~opcode[3])&(~opcode[2])&(opcode[1])&(opcode[0]);//00011
     and myIsAdd (myAdd, isR, isAdd);
     and myIsSub (mySub, isR, isSub);
 	assign rstatus_of_signal = (~overflow) ? 1'b0 : (isAddi|myAdd|mySub) ? 1'b1 : 1'b0;
@@ -174,7 +174,7 @@ module processor(
     alu my_pc_addN (pc_next, immeB, 5'b00000, 5'b00000, pc_addN, pc_isNotEqualN, pc_isLessThanN, pc_overflowN);
 	
     // j & jr & jal
-    assign pc_final = my_jal ? T : my_jr ? data_readRegA : final_JP ? T : br_sel ? pc_addN : pc_next;
+    assign pc_final = my_jal ? T : my_jr ? data_readRegA : JP ? T : br_sel ? pc_addN : pc_next;
     pc_regsiter my_pc (clock, reset, 1'b1, pc_final, pc_current);
     assign address_imem = pc_current[11:0];
 

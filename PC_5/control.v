@@ -1,6 +1,6 @@
-module control (opcode, aluOp, final_opcode, Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd, BR, JP, my_bne, my_blt);
+module control (opcode, aluOp, final_opcode, Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd, BR, JP, my_bne, my_blt, my_jal);
 	input [4:0] opcode, aluOp;
-    output Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd, BR, JP, my_bne, my_blt;
+    output Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd, BR, JP, my_bne, my_blt, my_jal;
     output [4:0] final_opcode;
 
     wire [4:0] opcode;
@@ -16,7 +16,7 @@ module control (opcode, aluOp, final_opcode, Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd
     wire my_j;
     assign my_bne = (~opcode[4])&(~opcode[3])&(~opcode[2])&(opcode[1])&(~opcode[0]);//00010
     assign my_j = (~opcode[4])&(~opcode[3])&(~opcode[2])&(~opcode[1])&(opcode[0]);//00001
-    //assign my_jal = (~opcode[4])&(~opcode[3])&(~opcode[2])&(opcode[1])&(opcode[0]);//00011
+    assign my_jal = (~opcode[4])&(~opcode[3])&(~opcode[2])&(opcode[1])&(opcode[0]);//00011
     //assign my_jr = (~opcode[4])&(~opcode[3])&(opcode[2])&(~opcode[1])&(~opcode[0]);//00100
     assign my_blt = (~opcode[4])&(~opcode[3])&(opcode[2])&(opcode[1])&(~opcode[0]);//00110
     assign my_bex = (opcode[4])&(~opcode[3])&(opcode[2])&(opcode[1])&(~opcode[0]);//10110
@@ -30,7 +30,7 @@ module control (opcode, aluOp, final_opcode, Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd
     assign DMwe = my_sw;
     assign Rwd = my_lw;
     assign BR = my_bne|my_blt;
-    assign JP = my_j;
+    assign JP = my_j|my_jal;
 
     // Find the final ALU opcode
     // If is R-type (opcode = 00000), then final code is aluOp
