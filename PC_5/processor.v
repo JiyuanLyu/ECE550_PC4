@@ -107,7 +107,6 @@ module processor(
     control my_ctrl (opcode, aluOp, final_opcode, Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd, BR, JP);
     assign my_jr = (~opcode[4])&(~opcode[3])&(opcode[2])&(~opcode[1])&(~opcode[0]);//00100
     
-
     assign rd = q_imem[26:22];
     assign rs = q_imem[21:17];
     assign rt = q_imem[16:12];
@@ -154,7 +153,7 @@ module processor(
     assign isR = (~opcode[4])&(~opcode[3])&(~opcode[2])&(~opcode[1])&(~opcode[0]);//00000
     assign isAdd = (~aluOp[4])&(~aluOp[3])&(~aluOp[2])&(~aluOp[1])&(~aluOp[0]);//00000
     assign isSub = (~aluOp[4])&(~aluOp[3])&(~aluOp[2])&(~aluOp[1])&(aluOp[0]);//00001
-    assign my_setx =(opcode[4])&(~opcode[3])&(~opcode[2])&(opcode[1])&(~opcode[0]);//10101
+    assign my_setx =(opcode[4])&(~opcode[3])&(opcode[2])&(~opcode[1])&(opcode[0]);//10101
     assign my_jal = (~opcode[4])&(~opcode[3])&(~opcode[2])&(opcode[1])&(opcode[0]);//00011
     and myIsAdd (myAdd, isR, isAdd);
     and myIsSub (mySub, isR, isSub);
@@ -176,9 +175,8 @@ module processor(
 	
     // j & jr & jal
     assign pc_final = my_jal ? T : my_jr ? data_readRegA : final_JP ? T : br_sel ? pc_addN : pc_next;
-    assign address_imem = pc_current[11:0];
-
     pc_regsiter my_pc (clock, reset, 1'b1, pc_final, pc_current);
+    assign address_imem = pc_current[11:0];
 
     // STEP: Write
     assign data_writeReg = my_jal ? pc_next : rstatus_of_signal ? rstatus_of : Rwd ? q_dmem : alu_result;
