@@ -117,9 +117,9 @@ module processor(
     assign T[31:27] = 5'b00000;
 
     // bex
-    wire BEX, my_bex, my_bex_neq, my_final_bex;
+    wire BEX, my_bex, my_bex_neq, my_final_bex, final_JP;
     wire [31:0] r30;
-    assign my_bex = (opcode[4])&(~opcode[3])&(opcode[2])&(opcode[1])&(~opcode[0]);//10110
+    //assign my_bex = (opcode[4])&(~opcode[3])&(opcode[2])&(opcode[1])&(~opcode[0]);//10110
     assign r30 = data_readRegA;
     assign my_bex_neq = r30[31]|r30[30]|r30[29]|r30[28]|r30[27]|r30[26]|r30[25]|r30[24]|r30[23]|r30[22]|r30[21]|r30[20]|r30[19]|r30[18]|r30[17]|r30[16]|r30[15]|r30[14]|r30[13]|r30[12]|r30[11]|r30[10]|r30[9]|r30[8]|r30[7]|r30[6]|r30[5]|r30[4]|r30[3]|r30[2]|r30[1]|r30[0];
     and my_bex_and (my_final_bex, my_bex, my_bex_neq);
@@ -146,20 +146,20 @@ module processor(
     assign br_sel = bne_sel|blt_sel;
 
     // overflow
-	wire rstatus_of_signal;
-    wire [31:0] rstatus_of;
+	wire rstatus_signal;
+    wire [31:0] rstatus;
     wire isAddi, isR, isAdd, isSub, myAdd, mySub;
     assign isAddi = (~opcode[4])&(~opcode[3])&(opcode[2])&(~opcode[1])&(opcode[0]);//00101
     assign isR = (~opcode[4])&(~opcode[3])&(~opcode[2])&(~opcode[1])&(~opcode[0]);//00000
     assign isAdd = (~aluOp[4])&(~aluOp[3])&(~aluOp[2])&(~aluOp[1])&(~aluOp[0]);//00000
     assign isSub = (~aluOp[4])&(~aluOp[3])&(~aluOp[2])&(~aluOp[1])&(aluOp[0]);//00001
-    assign my_setx =(opcode[4])&(~opcode[3])&(opcode[2])&(~opcode[1])&(opcode[0]);//10101
+    //assign my_setx =(opcode[4])&(~opcode[3])&(opcode[2])&(~opcode[1])&(opcode[0]);//10101
     //assign my_jal = (~opcode[4])&(~opcode[3])&(~opcode[2])&(opcode[1])&(opcode[0]);//00011
     and myIsAdd (myAdd, isR, isAdd);
     and myIsSub (mySub, isR, isSub);
-	assign rstatus_of_signal = (~overflow) ? 1'b0 : (isAddi|myAdd|mySub) ? 1'b1 : 1'b0;
-    assign rstatus_of = my_setx ? T : isAddi ? 32'd2 : myAdd ? 32'd1 : mySub ? 32'd3 : 32'b0;
-	assign ctrl_writeReg = my_jal ? 5'b11111 : my_setx ? 5'b11110 : rstatus_of_signal ? 5'b11110 : rd;
+	assign rstatus_signal = my_setx ? 1'b1 : (~overflow) ? 1'b0 : (isAddi|myAdd|mySub) ? 1'b1 : 1'b0;
+    assign rstatus = my_setx ? T : isAddi ? 32'd2 : myAdd ? 32'd1 : mySub ? 32'd3 : 32'b0;
+	assign ctrl_writeReg = my_jal ? 5'b11111 : rstatus_signal ? 5'b11110 : rd;
 
     // STEP: Memory
     assign address_dmem = alu_result[11:0];
@@ -174,12 +174,12 @@ module processor(
     alu my_pc_addN (pc_next, immeB, 5'b00000, 5'b00000, pc_addN, pc_isNotEqualN, pc_isLessThanN, pc_overflowN);
 	
     // j & jr & jal
-    assign pc_final = my_jr ? data_readRegA : JP ? T : br_sel ? pc_addN : pc_next;
+    assign pc_final = my_jr ? data_readRegA : final_JP ? T : br_sel ? pc_addN : pc_next;
     //assign pc_final = my_jal ? T : my_jr ? data_readRegA : JP ? T : br_sel ? pc_addN : pc_next;
     pc_regsiter my_pc (clock, reset, 1'b1, pc_final, pc_current);
     assign address_imem = pc_current[11:0];
 
     // STEP: Write
-    assign data_writeReg = my_jal ? pc_next : rstatus_of_signal ? rstatus_of : Rwd ? q_dmem : alu_result;
+    assign data_writeReg = my_jal ? pc_next : rstatus_signal ? rstatus : Rwd ? q_dmem : alu_result;
 
 endmodule
