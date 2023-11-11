@@ -20,7 +20,7 @@ module control (opcode, aluOp, final_opcode, Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd
     assign my_jr = (~opcode[4])&(~opcode[3])&(opcode[2])&(~opcode[1])&(~opcode[0]);//00100
     assign my_blt = (~opcode[4])&(~opcode[3])&(opcode[2])&(opcode[1])&(~opcode[0]);//00110
     assign my_bex = (opcode[4])&(~opcode[3])&(opcode[2])&(opcode[1])&(~opcode[0]);//10110
-    assign my_setx =(opcode[4])&(~opcode[3])&(opcode[2])&(~opcode[1])&(opcode[0]);//10101
+    assign my_setx = (opcode[4])&(~opcode[3])&(opcode[2])&(~opcode[1])&(opcode[0]);//10101
 
     // Define 8 signal
     or myRwe (Rwe, my_add, my_addi, my_lw, my_jal, my_setx);
