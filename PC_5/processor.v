@@ -126,8 +126,7 @@ module processor(
     // link s1 s2 and d for regfile
     assign ctrl_readRegA = BR ? rd : my_jr ? rd : my_bex ? 5'b11110 : rs;
     assign ctrl_readRegB = BR ? rs : Rdst ? rd : rt;
-    // assign ctrl_writeReg = rd;
-
+    
     // STEP: Execute
     // link to the ALU
     wire isNotEqual, isLessThan, overflow;
