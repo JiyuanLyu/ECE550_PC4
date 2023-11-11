@@ -115,6 +115,10 @@ module processor(
     assign T[26:0] = q_imem[26:0];
     assign T[31:27] = 5'b00000;
 
+    // link s1 s2 and d for regfile
+    assign ctrl_readRegA = BR ? rd : my_jr ? rd : my_bex ? 5'b11110 : rs;
+    assign ctrl_readRegB = BR ? rs : Rdst ? rd : rt;
+
     // bex
     wire BEX, my_bex_neq, my_final_bex, final_JP;
     wire [31:0] r30;
@@ -123,10 +127,6 @@ module processor(
     and my_bex_and (my_final_bex, my_bex, my_bex_neq);
     assign final_JP = my_final_bex ? 1'b1 : JP;
 
-    // link s1 s2 and d for regfile
-    assign ctrl_readRegA = BR ? rd : my_jr ? rd : my_bex ? 5'b11110 : rs;
-    assign ctrl_readRegB = BR ? rs : Rdst ? rd : rt;
-    
     // STEP: Execute
     // link to the ALU
     wire isNotEqual, isLessThan, overflow;
