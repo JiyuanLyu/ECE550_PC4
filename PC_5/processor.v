@@ -94,7 +94,7 @@ module processor(
 
 
     // STEP: Decode
-    wire Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd, BR, JP, my_bne, my_bl, my_jal, my_jr, my_setx;
+    wire Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd, BR, JP, my_bne, my_bl, my_jal, my_jr, my_bex, my_setx;
     // R-type
     wire [4:0] opcode, rd, rs, rt, shamt, aluOp, final_opcode;
     // I-type
@@ -104,7 +104,7 @@ module processor(
 
     assign opcode = q_imem[31:27];
     assign aluOp = q_imem[6:2];
-    control my_ctrl (opcode, aluOp, final_opcode, Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd, BR, JP, my_bne, my_blt, my_jal, my_jr, my_setx);
+    control my_ctrl (opcode, aluOp, final_opcode, Rwe, Rdst, ALUinB, ALUop, DMwe, Rwd, BR, JP, my_bne, my_blt, my_jal, my_jr, my_bex, my_setx);
     //assign my_jr = (~opcode[4])&(~opcode[3])&(opcode[2])&(~opcode[1])&(~opcode[0]);//00100
     
     assign rd = q_imem[26:22];
@@ -117,7 +117,7 @@ module processor(
     assign T[31:27] = 5'b00000;
 
     // bex
-    wire BEX, my_bex, my_bex_neq, my_final_bex, final_JP;
+    wire BEX, my_bex_neq, my_final_bex, final_JP;
     wire [31:0] r30;
     //assign my_bex = (opcode[4])&(~opcode[3])&(opcode[2])&(opcode[1])&(~opcode[0]);//10110
     assign r30 = data_readRegA;
