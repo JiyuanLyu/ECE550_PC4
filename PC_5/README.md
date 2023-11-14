@@ -29,11 +29,11 @@ This module, named **control**, takes inputs `opcode` and `aluOp` and identifies
 This module defines a **sx**. The purpose is to extend a 17-bit input signal `a` to a 32-bit output signal `out`, where the high 15 bits are extended with a sign extension.  
 
 ## processor 
-A module named **processor** is defined, which represents the core part of a processor.
-**Fetch**: Fetch instructions through the program counter (PC), pass the PC address to the instruction memory (`imem`) and fetch instructions.
-**Decode**: Parse instructions to extract information such as opcodes, ALU opcodes, target registers, etc., and generate control signals, including write enable (`Rwe`), read register addresses (`ctrl_readRegA` and `ctrl_readRegB`).
-**Execute**: Executes the command according to the ALU opcode, calculates the value of ALU input B, and detects overflow.
-**Memory**: Access data Memory (`dmem`) based on the results of the ALU, including address calculation, data writing, and data reading.
-**Write (write back)** : Write data back to the regfile according to the control signal, including write enable, write register address, and write data.
+A module named **processor** is defined, which represents the core part of a processor.  
+**Fetch**: Fetch instructions through the program counter (PC), pass the PC address to the instruction memory (`imem`) and fetch instructions. 
+**Decode**: Parse instructions to extract information such as opcodes, ALU opcodes, target registers, etc., and generate control signals, including write enable (`Rwe`), read register addresses (`ctrl_readRegA` and `ctrl_readRegB`).  
+**Execute**: Executes the command according to the ALU opcode, calculates the value of ALU input B, and detects overflow.  
+**Memory**: Access data Memory (`dmem`) based on the results of the ALU, including address calculation, data writing, and data reading.  
+**Write (write back)** : Write data back to the regfile according to the control signal, including write enable, write register address, and write data.  
 
 
