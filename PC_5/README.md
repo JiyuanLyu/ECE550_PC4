@@ -1,4 +1,4 @@
-# ECE 550 Project Checkpoint 4
+# ECE 550 Project Checkpoint 5
 Name: Jiyuan(Chelsea) Lyu, Jieying Zhang  
 netID: jl1230, jz450  
 
