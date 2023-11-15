@@ -29,11 +29,12 @@ This module, named **control**, takes inputs `opcode` and `aluOp` and identifies
 This module defines a **sx**. The purpose is to extend a 17-bit input signal `a` to a 32-bit output signal `out`, where the high 15 bits are extended with a sign extension.  
 
 ## processor 
-A module named **processor** is defined, which represents the core part of a processor.  
+The **processor** module represents a basic processor architecture with components for instruction fetch, decode, execute, memory access, and write back.  It includes interfaces for instruction memory (`imem`), data memory (`dmem`), and a register file (`regfile`).  The module takes in control signals, clock, and reset inputs, and provides outputs for memory addresses, data, write enables, and control signals for the register file.  
+**Decode**: Parse instructions to extract information such as opcodes, ALU opcodes, target registers, etc., and generate control signals, including write enable (`Rwe`), read register addresses (`ctrl_readRegA` and `ctrl_readRegB`). Decodes the opcode and aluOp from the instruction fetched. Derives control signals for various operations using the `control` module.  
+**Execute**: Utilizes the ALU to perform operations such as addition, subtraction, and logical operations. Handles conditional branches (bne and blt) and overflow conditions.  
+**Memory**: Access data Memory (`dmem`) based on the results of the ALU, including address calculation, data writing, and data reading.    
 **Fetch**: Fetch instructions through the program counter (PC), pass the PC address to the instruction memory (`imem`) and fetch instructions. 
-**Decode**: Parse instructions to extract information such as opcodes, ALU opcodes, target registers, etc., and generate control signals, including write enable (`Rwe`), read register addresses (`ctrl_readRegA` and `ctrl_readRegB`).  
-**Execute**: Executes the command according to the ALU opcode, calculates the value of ALU input B, and detects overflow.  
-**Memory**: Access data Memory (`dmem`) based on the results of the ALU, including address calculation, data writing, and data reading.  
 **Write (write back)** : Write data back to the regfile according to the control signal, including write enable, write register address, and write data.  
+Now this is a full-processor, it can implement add, addi, sub, and, or, sll, sra, sw, lw, j, bne, jal, jr, blt, bex and setx.
 
 
